@@ -454,3 +454,38 @@ Result:
 ![image](https://github.com/zizanayub/SQL-Projects/assets/65456659/72ee1de9-ac85-4be3-895d-6a96a199b30c)
 
 
+
+
+
+
+
+### ▶️ 12. Other Viable Debt Issues and Conclusion
+
+
+According to analysis, in this big dataset, there are 214 different debt indicators. Different countries owe these amounts based on these indicators. We have found out some insights till now such as- maximum debt owed by country, top 10 countries by debt, top indicators, the count of indicators, etc. From the indicators list, we can make an idea about the economic condition of the countries who took debt from The World Bank.
+
+
+In this README file, we analyzed about the debt owed by countries across the globe. We extracted few summary statistics from the data and found out some interesting facts and figuures. The findings were also validated to check if they were correct. 
+
+
+
+Finally, we will find out the highest debt a country has according to a specific indicator. 
+
+
+
+```SQL
+-- The highest debt paying countries according to indicators.
+
+SELECT Country_Name, Indicator_Code, Indicator_Name, MAX(Total_Debt) AS Maximum_Debt
+FROM idsdata
+GROUP BY Country_Name, Indicator_Code, Indicator_Name
+ORDER BY 3 DESC;
+```
+
+
+
+
+Result:
+
+
+
