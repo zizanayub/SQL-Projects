@@ -218,8 +218,32 @@ Output:
 ## ❓ 08. What is the total items and amount spent for each member before they became a member?
 
 
-### ▶️ 08.01. Approaches:
+### ▶️ Approaches:
 
 1. Joined all the 3 tables based on their common columns.
 2. Added required columns. Used aggregate functions `COUNT()` and `SUM()` to get the count of total items purchased and total amount spent by the customers respectively.
-3. Leveraged `GROUP BY` and `ORDER BY` clause to specifically find the outcomes based on customers' information. 
+3. Leveraged `GROUP BY` and `ORDER BY` clause to specifically find the outcomes based on customers' information.
+
+```SQL
+SELECT 
+      s.customer_id,
+      COUNT(s.product_id) AS count_of_purchased_items,
+      SUM(m.price) AS total_amount
+FROM sales s
+JOIN menu m 
+   ON s.product_id = m.product_id
+JOIN members mem
+   ON mem.customer_id = s.customer_id
+WHERE mem.join_date > s.order_date
+GROUP BY s.customer_id
+ORDER BY s.customer_id; 
+```
+
+
+
+Output:
+
+| customer_id | count_of_purchased_items | total_amount |
+|-------------|-------------------------|--------------|
+| A           | 2                       | 25           |
+| B           | 3                       | 40           |
