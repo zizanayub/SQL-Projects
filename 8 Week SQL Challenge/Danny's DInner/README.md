@@ -162,3 +162,47 @@ ORDER BY s.customer_id) AS orders_by_date
 
 WHERE order_rank = 1;
 ```
+
+
+
+
+## 07. Which item was purchased just before the customer became a member?
+
+### ▶️ 07.01. Nothing much. Same query, just change the sign from '>' to '<' as the `order_date` must be less than `joining_date'  
+
+
+```SQL
+SELECT 
+      customer_id,
+      order_date,
+      product_name
+FROM 
+(
+SELECT 
+      s.customer_id,
+      s.product_id,
+      m.product_name,
+      s.order_date,
+      DENSE_RANK() OVER 
+      (PARTITION BY s.customer_id
+      ORDER BY s.order_date) AS order_rank
+FROM sales s
+JOIN menu m 
+ON s.product_id = m.product_id
+JOIN members mem
+ON s.customer_id = mem.customer_id
+WHERE s.order_date < mem.join_date
+GROUP BY s.customer_id,s.product_id,m.product_name,s.order_date
+ORDER BY s.customer_id) AS orders_by_date
+
+WHERE order_rank = 1;
+```
+
+
+Output:
+
+| customer_id | date       | product |
+|-------------|------------|---------|
+| A           | 2021-01-01 | sushi   |
+| A           | 2021-01-01 | curry   |
+| B           | 2021-01-01 | curry   |
