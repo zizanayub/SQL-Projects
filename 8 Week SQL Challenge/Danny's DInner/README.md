@@ -260,3 +260,60 @@ Output:
 1. Join two tables `menu` and `sales` based on the common columns. Execute query to find total_purchased_items by customers using `GROUP BY` clause.
 2. Execute `CASE` statement to measure the points.
 3. Include the whole query in a subquery, named as `points_table`. Run the query with required column names and Group the whole query by `customer_id`
+
+```SQL
+SELECT
+	  s.customer_id,
+      s.product_id,
+      COUNT(s.product_id),
+      CASE 
+         WHEN m.product_id = 1 THEN COUNT(s.product_id)*m.price*20
+         ELSE COUNT(s.product_id)*m.price*10
+	  END AS points
+FROM sales s
+JOIN menu m
+ON s.product_id = m.product_id
+GROUP BY s.customer_id,m.product_id,m.price) AS points_table
+GROUP BY customer_id
+;
+```
+
+
+
+## ❓ 10. 08.10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi — how many points do customer A and B have after the joining?
+
+```SQL
+SELECT 
+     customer_id,
+     SUM(points)
+FROM
+(SELECT 
+      customer_id,
+      CASE
+        WHEN product_id != 1  AND (order_date BETWEEN join_date AND valid_date) THEN COUNT(product_id)*price*10*2
+        WHEN product_id = 1 AND (order_date BETWEEN join_date AND valid_date) THEN COUNT(product_id)*price*10*2*2
+        WHEN product_id = 1 THEN COUNT(product_id)*price*2*10
+        ELSE COUNT(product_id)*price*10
+	END AS points
+FROM
+(
+SELECT 
+      s.customer_id,
+      s.product_id,
+      s.order_date,
+      m.price,
+      mem.join_date,
+      DATE(mem.join_date + 6) AS valid_date
+FROM sales s
+JOIN menu m
+ON s.product_id = m.product_id
+JOIN members mem
+ON s.customer_id = mem.customer_id
+WHERE s.order_date >= mem.join_date AND MONTH(s.order_date) = 1
+GROUP BY s.customer_id,s.product_id,mem.join_date,s.order_date,m.price)
+AS first_week_summary
+GROUP BY customer_id,product_id,price,order_date,valid_date,join_date) AS points_by_customer_id
+GROUP BY customer_id
+ORDER BY SUM(points) DESC
+;
+```
