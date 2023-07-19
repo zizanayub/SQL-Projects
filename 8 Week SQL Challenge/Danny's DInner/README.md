@@ -1,4 +1,4 @@
-## ❓ Which item was the most popular for each customers?
+## ❓ 05. Which item was the most popular for each customers?
 
 ### ▶️ Approaches-01: 
 
@@ -100,3 +100,65 @@ Output:
 | B           | sushi        | 2                      |
 | B           | ramen        | 2                      |
 | C           | ramen        | 3                      |
+
+
+
+
+
+## ❓ 06. Which item was purchased after they become a member?
+
+### ▶️ 06.01. Approaches-01:
+
+First got the customers with their purchases after joining date. We first joined `sales` and `menu` table and then joined `members` table with connecting `customer_id` columns. 
+
+Then, finally got all the information where joining date is less than the order date. 
+
+```SQL
+SELECT 
+      s.customer_id,
+      s.product_id,
+      m.product_name,
+      s.order_date,
+      mem.join_date
+FROM sales s
+JOIN menu m 
+ON s.product_id = m.product_id
+JOIN members mem
+ON s.customer_id = mem.customer_id
+WHERE s.order_date > mem.join_date
+GROUP BY s.customer_id,s.product_id,m.product_name,s.order_date,mem.join_date;
+```
+
+
+
+### ▶️ 06.02. Approaches-02 (Final)
+
+Used `DENSE_RANK()` function to get the ranking by order_date of each customers after their joining date. Take the whole query in a subquery named `orders_by_date` and select required columns with `WHERE order_rank = 1`
+
+
+```
+SELECT 
+      customer_id,
+      order_date,
+      product_name
+FROM 
+(
+SELECT 
+      s.customer_id,
+      s.product_id,
+      m.product_name,
+      s.order_date,
+      DENSE_RANK() OVER 
+      (PARTITION BY s.customer_id
+      ORDER BY s.order_date) AS order_rank
+FROM sales s
+JOIN menu m 
+ON s.product_id = m.product_id
+JOIN members mem
+ON s.customer_id = mem.customer_id
+WHERE s.order_date > mem.join_date
+GROUP BY s.customer_id,s.product_id,m.product_name,s.order_date
+ORDER BY s.customer_id) AS orders_by_date
+
+WHERE order_rank = 1;
+```
