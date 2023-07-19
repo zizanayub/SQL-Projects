@@ -317,3 +317,69 @@ GROUP BY customer_id
 ORDER BY SUM(points) DESC
 ;
 ```
+
+
+
+
+
+
+## ❓ 11. Bonus Question: Join All the Things
+
+
+
+```SQL
+SELECT 
+     s.customer_id,
+     s.order_date,
+     m.product_name,
+     m.price,
+     CASE 
+        WHEN s.order_date >= mem.join_date THEN 'Y'
+        ELSE 'N'
+	 END AS member_status
+FROM sales s
+JOIN menu m
+   ON s.product_id = m.product_id
+JOIN members mem
+   ON mem.customer_id = s.customer_id
+ORDER BY s.customer_id,s.order_date;
+```
+
+
+
+## 12. Bonus Question: Rank all the Things
+
+Danny also requires further information about the ranking of customer products, but he purposely does not need the ranking for non-member purchases so he expects null ranking values for the records when customers are not yet part of the loyalty program.
+
+```SQL
+SELECT
+    customer_id,
+    order_date,
+    product_name,
+    price,
+    member_status,
+CASE 
+   WHEN member_status = 'Y' THEN
+           DENSE_RANK() OVER (PARTITION BY customer_id,member_status
+                              ORDER BY order_date)
+	ELSE 'null'
+END AS ranked
+FROM
+(
+SELECT 
+	s.customer_id,
+    s.order_date,
+    s.product_id,
+    m.product_name,
+    m.price,
+    CASE 
+       WHEN s.order_date >= mem.join_date THEN 'Y'
+       ELSE 'N'
+	END AS member_status
+FROM sales s
+JOIN menu m
+  ON s.product_id = m.product_id
+JOIN members mem
+  ON s.customer_id = mem.customer_id
+) AS member_status_table;
+```
