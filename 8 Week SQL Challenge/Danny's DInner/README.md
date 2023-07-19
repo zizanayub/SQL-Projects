@@ -136,7 +136,7 @@ GROUP BY s.customer_id,s.product_id,m.product_name,s.order_date,mem.join_date;
 Used `DENSE_RANK()` function to get the ranking by order_date of each customers after their joining date. Take the whole query in a subquery named `orders_by_date` and select required columns with `WHERE order_rank = 1`
 
 
-```
+```SQL
 SELECT 
       customer_id,
       order_date,
