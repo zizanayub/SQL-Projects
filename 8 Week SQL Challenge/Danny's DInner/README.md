@@ -209,3 +209,17 @@ Output:
 | A           | 2021-01-01 | sushi   |
 | A           | 2021-01-01 | curry   |
 | B           | 2021-01-01 | curry   |
+
+
+
+
+
+
+## ❓ 08. What is the total items and amount spent for each member before they became a member?
+
+
+### ▶️ 08.01. Approaches:
+
+1. Joined all the 3 tables based on their common columns.
+2. Added required columns. Used aggregate functions `COUNT()` and `SUM()` to get the count of total items purchased and total amount spent by the customers respectively.
+3. Leveraged `GROUP BY` and `ORDER BY` clause to specifically find the outcomes based on customers' information. 
