@@ -1,3 +1,68 @@
+## ❓ 01. What is the total amount each customer spent at the restaurant?
+
+```SQL
+SELECT 
+    s.customer_id,
+    SUM(m.price) "Total Amount Spent"
+FROM sales s
+JOIN menu m
+    ON s.product_id = m.product_id
+GROUP BY s.customer_id;
+```
+
+
+## ❓ 02. How many days has each customer visited the restaurant?
+
+```SQL
+SELECT
+      customer_id,
+      COUNT(DISTINCT order_date) visit_count 
+FROM sales
+GROUP BY customer_id
+ORDER BY visit_count DESC;
+```
+
+
+## ❓ 03. What was the first item from the menu purchased by each customer?
+
+```SQL
+SELECT
+    s.customer_id,
+    s.order_date,
+    m.product_name,
+    DENSE_RANK() OVER (PARTITION BY s.customer_id
+                       ORDER BY s.order_date) AS ranked_first_order
+FROM sales s 
+JOIN menu m
+   ON s.product_id = m.product_id
+GROUP BY s.customer_id,m.product_name,s.order_date
+ORDER BY s.order_date) 
+AS first_order_date
+
+WHERE ranked_first_order = 1
+;
+```
+
+
+## ❓ 04. What is the most purchased item on the menu and how many times was it purchased by all customers?
+
+
+```SQL
+SELECT 
+     s.product_id,
+     m.product_name,
+     COUNT(s.product_id) AS times_purchased
+FROM sales s
+JOIN menu m
+    ON s.product_id = m.product_id
+GROUP BY s.product_id,m.product_name
+ORDER BY times_purchased DESC
+LIMIT 1;
+```
+
+
+
+
 ## ❓ 05. Which item was the most popular for each customers?
 
 ### ▶️ Approaches-01: 
@@ -263,7 +328,7 @@ Output:
 
 ```SQL
 SELECT
-	  s.customer_id,
+      s.customer_id,
       s.product_id,
       COUNT(s.product_id),
       CASE 
@@ -280,7 +345,7 @@ GROUP BY customer_id
 
 
 
-## ❓ 10. 08.10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi — how many points do customer A and B have after the joining?
+## ❓ 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi — how many points do customer A and B have after the joining?
 
 ```SQL
 SELECT 
@@ -347,7 +412,7 @@ ORDER BY s.customer_id,s.order_date;
 
 
 
-## 12. Bonus Question: Rank all the Things
+## ❓ 12. Bonus Question: Rank all the Things
 
 Danny also requires further information about the ranking of customer products, but he purposely does not need the ranking for non-member purchases so he expects null ranking values for the records when customers are not yet part of the loyalty program.
 
