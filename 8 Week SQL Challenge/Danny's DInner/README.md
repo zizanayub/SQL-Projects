@@ -166,9 +166,12 @@ WHERE order_rank = 1;
 
 
 
-## 07. Which item was purchased just before the customer became a member?
+## ❓ 07. Which item was purchased just before the customer became a member?
 
-### ▶️ 07.01. Nothing much. Same query, just change the sign from '>' to '<' as the `order_date` must be less than `joining_date'  
+### ▶️ 07.01. Approach:
+
+
+Nothing much. Same query, just change the sign from '>' to '<' as the `order_date` must be less than `joining_date'  
 
 
 ```SQL
