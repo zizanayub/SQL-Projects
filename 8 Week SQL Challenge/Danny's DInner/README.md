@@ -247,3 +247,16 @@ Output:
 |-------------|-------------------------|--------------|
 | A           | 2                       | 25           |
 | B           | 3                       | 40           |
+
+
+
+
+
+
+## ❓ 09. If each $1 spent equates to 10 points and sushi has a 2x points multiplier — how many points would each customer have?
+
+### ▶️ Approaches:
+
+1. Join two tables `menu` and `sales` based on the common columns. Execute query to find total_purchased_items by customers using `GROUP BY` clause.
+2. Execute `CASE` statement to measure the points.
+3. Include the whole query in a subquery, named as `points_table`. Run the query with required column names and Group the whole query by `customer_id`
