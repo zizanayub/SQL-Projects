@@ -1,3 +1,17 @@
+## Problem Statement
+
+Danny has a restaurant. After managing that restaurant for few months, Danny had an idea to expand his restaurant business and introduce personalized experience for the customers. He decided that data analysis will be the best solution to find the possible solution and idea.
+
+He wanted specifically insights about:
+
+Customer's visiting patterns in the restaurant.
+Which item is the most favorite to the customers.
+How much money customers spent to buy food from his restautant.
+Regrettably, due to privacy considerations, the restaurant owner, Danny, is unable to share the actual database. However, he has provided us with a conceptual understanding of the data structure, which consists of three tables: sales,menu, and members. These tables form the foundation for conducting the analysis task at hand.
+
+![image](https://github.com/zizanayub/SQL-Projects/assets/65456659/6f94f850-2bb9-4718-97b7-ef6d1c93fc1c)
+
+
 ## ❓ 01. What is the total amount each customer spent at the restaurant?
 
 
