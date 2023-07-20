@@ -1,5 +1,11 @@
 ## ❓ 01. What is the total amount each customer spent at the restaurant?
 
+
+### Approaches:
+
+1. First, I selected the required column names and added an aggregate function `SUM()` to find out `Total Amount Spent`
+2. `GROUP BY` customer_id
+
 ```SQL
 SELECT 
     s.customer_id,
@@ -10,8 +16,19 @@ JOIN menu m
 GROUP BY s.customer_id;
 ```
 
+Output:
+
+
+
+
+![image](https://github.com/zizanayub/SQL-Projects/assets/65456659/e7ab2416-a6e0-4f49-a623-53013c17952a)
+
 
 ## ❓ 02. How many days has each customer visited the restaurant?
+
+### Approaches:
+
+Nothing complex. Just select order dates distinctly and order them in descending order. You must group selected column names by customer_id since it required " by each customer" 
 
 ```SQL
 SELECT
@@ -23,10 +40,26 @@ ORDER BY visit_count DESC;
 ```
 
 
+Output:
+
+
+![image](https://github.com/zizanayub/SQL-Projects/assets/65456659/78b4838b-5bed-4d03-9bab-3672329aaab3)
+
+
 ## ❓ 03. What was the first item from the menu purchased by each customer?
 
+1. To get the ranking of the order dates, `DENSE_RANK()` function will be workable here. We should write the query based on the customers. After partitioning the
+outcomes by customer_id, order each partition by `order_date`.
+
+2. Like previous, use `GROUP BY` and `ORDER BY` clauses as necessary. `GROUP BY` all the columns you mentioned after the `SELECT` statement. Order the outcome by order dates.
+3. As we need the first date, we must add a `WHERE` clause here. The condition will be `WHERE ranked_first_order=1`
+
 ```SQL
-SELECT
+SELECT 
+     customer_id,
+     product_name
+FROM
+(SELECT
     s.customer_id,
     s.order_date,
     m.product_name,
@@ -43,6 +76,15 @@ WHERE ranked_first_order = 1
 ;
 ```
 
+
+Output:
+
+
+
+![image](https://github.com/zizanayub/SQL-Projects/assets/65456659/6f7d3cd9-62f9-4fea-8433-96ad8f364238)
+
+
+Here, customer A ordered two dishes simultaneously. So, it gave output two dishes. 
 
 ## ❓ 04. What is the most purchased item on the menu and how many times was it purchased by all customers?
 
