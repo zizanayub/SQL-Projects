@@ -620,3 +620,75 @@ FROM cte_customer_orders
 GROUP BY day_of_week;
 
 
+
+
+USE pizza_runner;
+
+
+
+
+
+-- 04. B. 
+
+-- 04.01. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)
+
+SELECT 
+    EXTRACT(WEEK FROM DATE_ADD(registration_date,INTERVAL 1 WEEK)) AS registration_week,
+    COUNT(runner_id) AS runners_count
+FROM runners
+GROUP BY registration_week;
+
+
+
+-- 04.02. What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?
+
+WITH cte_runner_orders AS (
+    SELECT 
+        order_id,
+        runner_id,
+        CASE 
+           WHEN pickup_time IS NULL OR pickup_time LIKE 'null' THEN ' '
+           ELSE pickup_time
+        END AS pickup_time,
+        CASE 
+           WHEN distance REGEXP 'km' THEN TRIM('km' FROM distance)
+           WHEN distance IS NULL OR distance LIKE 'null' THEN ' '
+           ELSE distance 
+        END AS distance,
+        CASE 
+           WHEN duration REGEXP 'minutes' THEN TRIM('minutes' FROM duration)
+           WHEN duration REGEXP 'mins' THEN TRIM('mins' FROM duration)
+           WHEN duration REGEXP 'minute' THEN TRIM('minute' FROM duration)
+           WHEN duration IS NULL OR duration LIKE 'null' THEN ' ' 
+           ELSE duration
+        END AS duration,
+        CASE 
+           WHEN cancellation IS NULL OR cancellation LIKE 'null' THEN ' ' 
+           ELSE cancellation
+        END AS cancellation
+    FROM runner_orders
+),
+cte_customer_orders AS (
+SELECT
+	order_id,
+    customer_id, 
+    pizza_id,
+    CASE 
+       WHEN exclusions is NULL OR exclusions LIKE 'null' THEN ' '
+       ELSE exclusions 
+	END AS exclusions,
+	CASE 
+       WHEN extras is NULL OR extras LIKE 'null' THEN ' '
+       ELSE extras
+	END AS extras,
+    order_time
+FROM customer_orders)
+
+SELECT
+    ro.runner_id,
+    AVG(DATEDIFF(EXTRACT(MINUTE FROM ro.pickup_time),EXTRACT(MINUTE FROM co.order_time))) AS Avg_Duration_of_pickup
+FROM cte_customer_orders co 
+JOIN cte_runner_orders ro 
+   ON co.order_id = ro.order_id
+WHERE ro.distance != " "
+GROUP BY ro.runner_id,ro.pickup_time,co.order_time;
