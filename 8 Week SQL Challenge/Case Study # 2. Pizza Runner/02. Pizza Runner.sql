@@ -692,3 +692,217 @@ JOIN cte_runner_orders ro
    ON co.order_id = ro.order_id
 WHERE ro.distance != " "
 GROUP BY ro.runner_id,ro.pickup_time,co.order_time;
+
+
+
+
+
+
+-- 04.03. Is there any relationship between the number of pizzas and how long the order takes to prepare?
+
+WITH cte_runner_orders AS (
+    SELECT 
+        order_id,
+        runner_id,
+        CASE 
+           WHEN pickup_time IS NULL OR pickup_time LIKE 'null' THEN ' '
+           ELSE pickup_time
+        END AS pickup_time,
+        CASE 
+           WHEN distance REGEXP 'km' THEN TRIM('km' FROM distance)
+           WHEN distance IS NULL OR distance LIKE 'null' THEN ' '
+           ELSE distance 
+        END AS distance,
+        CASE 
+           WHEN duration REGEXP 'minutes' THEN TRIM('minutes' FROM duration)
+           WHEN duration REGEXP 'mins' THEN TRIM('mins' FROM duration)
+           WHEN duration REGEXP 'minute' THEN TRIM('minute' FROM duration)
+           WHEN duration IS NULL OR duration LIKE 'null' THEN ' ' 
+           ELSE duration
+        END AS duration,
+        CASE 
+           WHEN cancellation IS NULL OR cancellation LIKE 'null' THEN ' ' 
+           ELSE cancellation
+        END AS cancellation
+    FROM runner_orders
+),
+cte_customer_orders AS (
+SELECT
+	order_id,
+    customer_id, 
+    pizza_id,
+    CASE 
+       WHEN exclusions is NULL OR exclusions LIKE 'null' THEN ' '
+       ELSE exclusions 
+	END AS exclusions,
+	CASE 
+       WHEN extras is NULL OR extras LIKE 'null' THEN ' '
+       ELSE extras
+	END AS extras,
+    order_time
+FROM customer_orders)
+
+SELECT 
+    order_count,
+    AVG(order_takes_to_prepare_in_mins)
+FROM
+(   
+
+SELECT
+    co.order_id, 
+    COUNT(co.order_id) AS order_count,
+    TIMESTAMPDIFF(MINUTE,co.order_time,ro.pickup_time) AS order_takes_to_prepare_in_mins
+
+FROM cte_customer_orders co
+JOIN cte_runner_orders ro
+   ON co.order_id = ro.order_id
+WHERE distance != " "
+GROUP BY co.order_id,co.order_time,ro.pickup_time
+) AS order_count_stats
+GROUP BY order_count;
+ 
+
+
+
+
+-- 04.04. What was the average distance travelled for each customer?
+
+WITH cte_runner_orders AS (
+    SELECT 
+        order_id,
+        runner_id,
+        CASE 
+           WHEN pickup_time IS NULL OR pickup_time LIKE 'null' THEN ' '
+           ELSE pickup_time
+        END AS pickup_time,
+        CASE 
+           WHEN distance REGEXP 'km' THEN TRIM('km' FROM distance)
+           WHEN distance IS NULL OR distance LIKE 'null' THEN ' '
+           ELSE distance 
+        END AS distance,
+        CASE 
+           WHEN duration REGEXP 'minutes' THEN TRIM('minutes' FROM duration)
+           WHEN duration REGEXP 'mins' THEN TRIM('mins' FROM duration)
+           WHEN duration REGEXP 'minute' THEN TRIM('minute' FROM duration)
+           WHEN duration IS NULL OR duration LIKE 'null' THEN ' ' 
+           ELSE duration
+        END AS duration,
+        CASE 
+           WHEN cancellation IS NULL OR cancellation LIKE 'null' THEN ' ' 
+           ELSE cancellation
+        END AS cancellation
+    FROM runner_orders
+),
+cte_customer_orders AS (
+SELECT
+	order_id,
+    customer_id, 
+    pizza_id,
+    CASE 
+       WHEN exclusions is NULL OR exclusions LIKE 'null' THEN ' '
+       ELSE exclusions 
+	END AS exclusions,
+	CASE 
+       WHEN extras is NULL OR extras LIKE 'null' THEN ' '
+       ELSE extras
+	END AS extras,
+    order_time
+FROM customer_orders)
+
+
+SELECT 
+    co.customer_id,
+    ROUND(AVG(ro.distance)) AS "Average Distance"
+FROM cte_customer_orders co
+JOIN cte_runner_orders ro 
+   ON co.order_id = ro.order_id
+WHERE distance != " " 
+GROUP BY co.customer_id;
+
+
+
+
+
+
+
+-- 04.05. What was the difference between the longest and shortest delivery times for all orders?
+
+WITH cte_runner_orders AS (
+    SELECT 
+        order_id,
+        runner_id,
+        CASE 
+           WHEN pickup_time IS NULL OR pickup_time LIKE 'null' THEN ' '
+           ELSE pickup_time
+        END AS pickup_time,
+        CASE 
+           WHEN distance REGEXP 'km' THEN TRIM('km' FROM distance)
+           WHEN distance IS NULL OR distance LIKE 'null' THEN ' '
+           ELSE distance 
+        END AS distance,
+        CASE 
+           WHEN duration REGEXP 'minutes' THEN TRIM('minutes' FROM duration)
+           WHEN duration REGEXP 'mins' THEN TRIM('mins' FROM duration)
+           WHEN duration REGEXP 'minute' THEN TRIM('minute' FROM duration)
+           WHEN duration IS NULL OR duration LIKE 'null' THEN ' ' 
+           ELSE duration
+        END AS duration,
+        CASE 
+           WHEN cancellation IS NULL OR cancellation LIKE 'null' THEN ' ' 
+           ELSE cancellation
+        END AS cancellation
+    FROM runner_orders
+)
+
+SELECT 
+    MAX(duration),
+    MIN(duration),
+    (MAX(duration) - MIN(duration)) AS "Difference Between Delivery Times"
+
+FROM cte_runner_orders
+WHERE duration != " "; 
+
+
+
+
+
+
+
+-- 04.06. What was the average speed for each runner for each delivery and do you notice any trend for these values?
+WITH cte_runner_orders AS (
+    SELECT 
+        order_id,
+        runner_id,
+        CASE 
+           WHEN pickup_time IS NULL OR pickup_time LIKE 'null' THEN ' '
+           ELSE pickup_time
+        END AS pickup_time,
+        CASE 
+           WHEN distance REGEXP 'km' THEN TRIM('km' FROM distance)
+           WHEN distance IS NULL OR distance LIKE 'null' THEN ' '
+           ELSE distance 
+        END AS distance,
+        CASE 
+           WHEN duration REGEXP 'minutes' THEN TRIM('minutes' FROM duration)
+           WHEN duration REGEXP 'mins' THEN TRIM('mins' FROM duration)
+           WHEN duration REGEXP 'minute' THEN TRIM('minute' FROM duration)
+           WHEN duration IS NULL OR duration LIKE 'null' THEN ' ' 
+           ELSE duration
+        END AS duration,
+        CASE 
+           WHEN cancellation IS NULL OR cancellation LIKE 'null' THEN ' ' 
+           ELSE cancellation
+        END AS cancellation
+    FROM runner_orders)
+
+SELECT 
+   order_id, 
+   runner_id,
+   (distance*1000) AS distance_in_metre,
+   (duration*60) AS duration_in_seconds,
+   (duration/60) AS duration_in_hr,
+   ROUND((distance*1000)/(duration*60)) AS "Average Speed in m/s",
+   ROUND(distance/(duration/60)) AS "Average Speed in km/hr"
+FROM cte_runner_orders
+WHERE duration != " " 
+GROUP BY order_id,runner_id,distance,duration;
