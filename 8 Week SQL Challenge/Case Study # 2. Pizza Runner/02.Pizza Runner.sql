@@ -948,3 +948,32 @@ SELECT
 		END)/COUNT(*))) AS success_percentage 
 FROM cte_runner_orders
 GROUP BY runner_id;
+
+
+
+
+USE pizza_runner;
+
+-- 05.01. What are the standard ingredients for each pizza?
+SELECT
+    topping_id,
+    topping_name,
+    COUNT(DISTINCT pizza_id) AS pizzas
+FROM pizza_recipes pr ;
+
+DROP TABLE IF EXISTS numbers;
+CREATE TABLE numbers (n INT);
+
+INSERT INTO numbers (n)
+VALUES (1), (2), (3), (4), (5), (6), (10); -- Add more numbers as needed
+
+
+SELECT
+  Pizza_id,
+  SUBSTRING_INDEX(SUBSTRING_INDEX(Toppings, ', ', n), ', ', -1) AS ToppingID
+FROM pizza_recipes
+JOIN numbers ON CHAR_LENGTH(Toppings) - CHAR_LENGTH(REPLACE(Toppings, ', ', '')) >= n - 1
+ORDER BY pizza_id;
+
+
+SELECT * FROM pizza_recipes;
