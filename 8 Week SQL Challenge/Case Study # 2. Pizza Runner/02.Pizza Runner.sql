@@ -906,3 +906,45 @@ SELECT
 FROM cte_runner_orders
 WHERE duration != " " 
 GROUP BY order_id,runner_id,distance,duration;
+
+
+
+
+
+
+-- 04.07. What is the successful delivery percentage of each runner?
+
+WITH cte_runner_orders AS (
+    SELECT 
+        order_id,
+        runner_id,
+        CASE 
+           WHEN pickup_time IS NULL OR pickup_time LIKE 'null' THEN ' '
+           ELSE pickup_time
+        END AS pickup_time,
+        CASE 
+           WHEN distance REGEXP 'km' THEN TRIM('km' FROM distance)
+           WHEN distance IS NULL OR distance LIKE 'null' THEN ' '
+           ELSE distance 
+        END AS distance,
+        CASE 
+           WHEN duration REGEXP 'minutes' THEN TRIM('minutes' FROM duration)
+           WHEN duration REGEXP 'mins' THEN TRIM('mins' FROM duration)
+           WHEN duration REGEXP 'minute' THEN TRIM('minute' FROM duration)
+           WHEN duration IS NULL OR duration LIKE 'null' THEN ' ' 
+           ELSE duration
+        END AS duration,
+        CASE 
+           WHEN cancellation IS NULL OR cancellation LIKE 'null' THEN ' ' 
+           ELSE cancellation
+        END AS cancellation
+    FROM runner_orders)
+
+SELECT
+    runner_id,
+    ROUND(100*(SUM(CASE 
+		  WHEN distance = " " THEN 0 
+          ELSE 1 
+		END)/COUNT(*))) AS success_percentage 
+FROM cte_runner_orders
+GROUP BY runner_id;
