@@ -954,26 +954,43 @@ GROUP BY runner_id;
 
 USE pizza_runner;
 
+
+
+
 -- 05.01. What are the standard ingredients for each pizza?
-SELECT
-    topping_id,
-    topping_name,
-    COUNT(DISTINCT pizza_id) AS pizzas
-FROM pizza_recipes pr ;
+
 
 DROP TABLE IF EXISTS numbers;
 CREATE TABLE numbers (n INT);
 
 INSERT INTO numbers (n)
-VALUES (1), (2), (3), (4), (5), (6), (10); -- Add more numbers as needed
+VALUES (1), (2), (3), (4), (5), (8); -- Add more numbers as needed
 
 
+-- ChatGPT gave me this solution
 SELECT
   Pizza_id,
-  SUBSTRING_INDEX(SUBSTRING_INDEX(Toppings, ', ', n), ', ', -1) AS ToppingID
+  SUBSTRING_INDEX(SUBSTRING_INDEX(Toppings, ', ',n), ', ', -1) AS ToppingID
 FROM pizza_recipes
 JOIN numbers ON CHAR_LENGTH(Toppings) - CHAR_LENGTH(REPLACE(Toppings, ', ', '')) >= n - 1
 ORDER BY pizza_id;
 
 
 SELECT * FROM pizza_recipes;
+
+
+
+-- 05.01.01. First, extract the string by using substring_index()
+SELECT 
+   pizza_id,
+   SUBSTRING_INDEX(Toppings,', ',8) AS ToppingID
+FROM pizza_recipes;
+  
+  
+  
+  
+-- 05.01.02. Extract the last number using substring_index() again
+SELECT 
+   pizza_id,
+   SUBSTRING_INDEX(SUBSTRING_INDEX(Toppings,', ',3),', ',-1) AS ToppingID
+FROM pizza_recipes;
