@@ -961,30 +961,20 @@ USE pizza_runner;
 
 
 DROP TABLE IF EXISTS numbers;
+
 CREATE TABLE numbers (n INT);
 
 INSERT INTO numbers (n)
 VALUES (1), (2), (3), (4), (5), (8); -- Add more numbers as needed
 
-
--- ChatGPT gave me this solution
-SELECT
-  Pizza_id,
-  SUBSTRING_INDEX(SUBSTRING_INDEX(Toppings, ', ',n), ', ', -1) AS ToppingID
-FROM pizza_recipes
-JOIN numbers ON CHAR_LENGTH(Toppings) - CHAR_LENGTH(REPLACE(Toppings, ', ', '')) >= n - 1
-ORDER BY pizza_id;
-
-
 SELECT * FROM pizza_recipes;
 
 
-USE pizza_runner;
 
 -- 05.01.01. First, extract the string by using substring_index()
 SELECT 
    pizza_id,
-   SUBSTRING_INDEX(Toppings,', ',8) AS ToppingID
+   SUBSTRING_INDEX(Toppings,', ',2) AS ToppingID
 FROM pizza_recipes;
   
   
@@ -993,5 +983,56 @@ FROM pizza_recipes;
 -- 05.01.02. Extract the last number using substring_index() again
 SELECT 
    pizza_id,
-   SUBSTRING_INDEX(SUBSTRING_INDEX(Toppings,', ',8),', ',-1) AS ToppingID
+   SUBSTRING_INDEX(SUBSTRING_INDEX(Toppings,', ',2),', ',-1) AS ToppingID
 FROM pizza_recipes;
+
+
+
+
+
+
+
+-- 05.01. Final Answer
+
+
+
+-- Normalize Pizza Recipe table
+DROP TABLE IF EXISTS pizza_recipes_table;
+CREATE TABLE pizza_recipes_table 
+(
+ pizza_id int,
+ toppings int);
+INSERT INTO pizza_recipes_table
+(pizza_id, toppings) 
+values
+(1,1),
+(1,2),
+(1,3),
+(1,4),
+(1,5),
+(1,6),
+(1,8),
+(1,10),
+(2,4),
+(2,6),
+(2,7),
+(2,9),
+(2,11),
+(2,12);
+
+
+
+-- Now find out the query result
+WITH cte_pizza_recipes AS (
+SELECT pn.pizza_name,pizza_recipes_table.pizza_id, pt.topping_name
+FROM pizza_recipes_table
+JOIN pizza_toppings pt
+on pizza_recipes_table.toppings = pt.topping_id
+JOIN pizza_names pn
+ON pn.pizza_id = pizza_recipes_table.pizza_id
+ORDER BY pn.pizza_name, pizza_recipes_table.pizza_id)
+
+
+SELECT pizza_name, GROUP_CONCAT(topping_name) as StandardToppings
+FROM cte_pizza_recipes
+GROUP BY pizza_name;
