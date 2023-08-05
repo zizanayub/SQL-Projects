@@ -979,6 +979,7 @@ ORDER BY pizza_id;
 SELECT * FROM pizza_recipes;
 
 
+USE pizza_runner;
 
 -- 05.01.01. First, extract the string by using substring_index()
 SELECT 
@@ -992,5 +993,5 @@ FROM pizza_recipes;
 -- 05.01.02. Extract the last number using substring_index() again
 SELECT 
    pizza_id,
-   SUBSTRING_INDEX(SUBSTRING_INDEX(Toppings,', ',3),', ',-1) AS ToppingID
+   SUBSTRING_INDEX(SUBSTRING_INDEX(Toppings,', ',8),', ',-1) AS ToppingID
 FROM pizza_recipes;
